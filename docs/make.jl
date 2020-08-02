@@ -12,6 +12,7 @@ makedocs(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://zdroid.github.io/ChemEquations.jl",
         assets=String[],
+        analytics="UA-33643623-2",
     ),
     pages=[
         "Home" => "index.md",

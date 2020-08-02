@@ -83,8 +83,13 @@ true
 ## Using unicode characters
 
 All unicode characters that are letters (such as α and β) or symbols (such as × and ÷) are supported in the input.
+That allows some exotic examples:
+```julia-repl
+julia> ce"Σ{+1} + Θ{-1} = Θ2 + Σ2"
+ce"Σ{+} + Θ{-} = Θ2 + Σ2"
+```
 
-Compounds are composed of elements, where an element begins with an uppercase unicode letter and
+This works because compounds are parsed by elements, where an element begins with an uppercase unicode letter and
 ends with a lowercase unicode letter or a unicode symbol.
 
 !!! info
@@ -98,6 +103,9 @@ Unicode input allows writing some equations very nicely:
 ```julia-repl
 julia> ce"⏣H + Cl2 = ⏣Cl + HCl"
 ce"⏣H + Cl2 = ⏣Cl + HCl"
+
+julia> ce"C + α = O + γ" # a reaction from triple-α process
+ce"C + α = O + γ"
 ```
 
 ## Advanced usage
