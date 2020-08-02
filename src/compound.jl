@@ -28,7 +28,7 @@ ends with a lowercase unicode letter or a unicode symbol.
     An element can also begin with a symbol if
     the symbol is the first character (e.g. `"⬡H"`).
 
-Parsing is insensitive to whitespace and dashes (`_`).
+Parsing is insensitive to whitespace and underscores (`_`).
 Special parsing is implemented for:
 - parens (e.g. `"(CH3COO)2Mg"`)
 - compounds with `"*"` (e.g. `"CuSO4 * 5H2O"`)
