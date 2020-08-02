@@ -1,5 +1,5 @@
-combustion = ChemEquation("C2H4 + O2 = CO2 + 2 H2O")
-redox = ChemEquation("H{+} + Cr2O7{2-} + C2H5OH = Cr{3+} + CO2 + H2O")
+combustion = ce"C2H4 + O2 = CO2 + 2 H2O"
+redox = ce"H{+} + Cr2O7{2-} + C2H5OH = Cr{3+} + CO2 + H2O"
 
 @testset "equationmatrix" begin
     @test equationmatrix(combustion) == [
@@ -14,8 +14,8 @@ redox = ChemEquation("H{+} + Cr2O7{2-} + C2H5OH = Cr{3+} + CO2 + H2O")
         0   0  2  0  1  0
         1  -2  0  3  0  0
     ]
-    @test equationmatrix(ChemEquation("151 H2 + 32 O2 = 7 H2O")) ==
-        equationmatrix(ChemEquation("5 H2 + O2 = 5 H2O"))
+    @test equationmatrix(ce"151 H2 + 32 O2 = 7 H2O") ==
+        equationmatrix(ce"5 H2 + O2 = 5 H2O")
 end
 
 @testset "balance" begin
@@ -33,8 +33,8 @@ end
         0  0  0  0  6  14  1  0  -2   0   -7
         0  0  0  0  0  16  2  1  -4  -2  -11
     ]
-    @test balance(equationmatrix(ChemEquation("H2 + O2 = H2O"))) ==
-        balance(equationmatrix(ChemEquation("2 H2 + O2 = 2 H2O")))
+    @test balance(equationmatrix(ce"H2 + O2 = H2O")) ==
+        balance(equationmatrix(ce"2 H2 + O2 = 2 H2O"))
 
     # Original equation should be unchanged
     balanced_combustion = balance(combustion)
@@ -65,6 +65,6 @@ end
         @test balance(ChemEquation(equation[1])) == ChemEquation(equation[2])
     end
 
-    @test_throws ErrorException balance(ChemEquation("H2 + O = H + O"))
-    @test_throws ErrorException balance(ChemEquation("H2 + O = H + O + C"))
+    @test_throws ErrorException balance(ce"H2 + O = H + O")
+    @test_throws ErrorException balance(ce"H2 + CO = H2O")
 end
