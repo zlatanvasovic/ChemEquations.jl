@@ -1,8 +1,16 @@
 "Type stored in `ChemEquation.tuples`."
 const CompoundTuple = Tuple{Compound, Int}
 
-"Characters used to split a chemical equation into two sides."
-const EQUALCHARS = ['=', '→', '↔', '⇄', '⇆', '⇌', '⇋']
+fwd_arrows = ['>', '→', '↣', '↦', '⇾', '⟶', '⟼', '⥟', '⥟', '⇀', '⇁', '⇒', '⟾']
+bwd_arrows = ['<', '←', '↢', '↤', '⇽', '⟵', '⟻', '⥚', '⥞', '↼', '↽', '⇐', '⟽']
+double_arrows = ['↔', '⟷', '⇄', '⇆', '⇌', '⇋', '⇔', '⟺']
+pure_rate_arrows = ['⇐', '⟽', '⇒', '⟾', '⇔', '⟺']
+equal_signs = ['=', '≔', '⩴', '≕']
+"""
+Characters used to split a chemical equation into two sides.
+Source: <https://github.com/SciML/Catalyst.jl/blob/master/src/reaction_network.jl#L56>
+"""
+const EQUALCHARS = vcat(fwd_arrows, bwd_arrows, double_arrows, pure_rate_arrows, equal_signs)
 
 "Regex to split a chemical equation into compounds."
 const PLUSREGEX = r"(?<!{)\+(?!})"
@@ -18,7 +26,7 @@ end
 Constructs a chemical equation from the given string.
 
 Parsing is insensitive to whitespace.
-Any character in `$EQUALCHARS` separates the equation into two sides,
+Any character in [`EQUALCHARS`](@ref) separates the equation into two sides,
 while `+` separates the equation into compounds.
 
 # Examples

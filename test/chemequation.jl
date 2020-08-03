@@ -1,5 +1,5 @@
 water_formation = ce"2 H2 + O2 → 2 H2O"
-ionic_reaction = ce"Na{+} + Cl{-} = NaCl"
+ionic_reaction = ce"Na{+} + Cl{-} > NaCl"
 redox = ce"Cr2O7{-2} + H{+1} + {-} = Cr{3+} + H2O"
 
 @testset "ChemEquation" begin
