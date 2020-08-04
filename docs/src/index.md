@@ -26,6 +26,6 @@ ce"CH4 + 2 O2 = CO2 + 2 H2O"
 
 You can install the package by pressing `]` in Julia REPL and typing:
 
-```jl
-add https://github.com/zdroid/ChemEquations.jl
+```julia
+add ChemEquations
 ```
