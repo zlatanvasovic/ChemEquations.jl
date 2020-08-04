@@ -5,8 +5,7 @@ Write and balance chemical equations elegantly and efficiently.
 """
 module ChemEquations
 
-using LinearAlgebra: I
-using AbstractAlgebra: matrix, ZZ, hnf
+using LinearAlgebraX: I, nullspacex
 using DocStringExtensions
 @template (CONSTANTS, MACROS) =
     """

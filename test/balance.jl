@@ -19,20 +19,9 @@ redox = ce"H{+} + Cr2O7{2-} + C2H5OH = Cr{3+} + CO2 + H2O"
 end
 
 @testset "balance" begin
-    @test balance(equationmatrix(combustion)) == [
-        1  0  0  0  -1   1   0
-        0  2  1  0   0   0   1
-        0  0  2  0   1   0   0
-        0  0  0  1   3  -2  -2
-    ]
-    @test balance(equationmatrix(redox)) == [
-        1  0  0  0  1   1  0  0   0   0    0
-        0  1  0  0  3   0  0  0   1   0    0
-        0  0  1  0  4  12  1  0  -2   0   -6
-        0  0  0  1  4   4  0  0   0   1   -2
-        0  0  0  0  6  14  1  0  -2   0   -7
-        0  0  0  0  0  16  2  1  -4  -2  -11
-    ]
+    # [:,:] required to reshape Vector to Nx1 Array
+    @test balance(equationmatrix(combustion)) == [-1//2; -3//2; 1//1; 1//1][:,:]
+    @test balance(equationmatrix(redox)) ==  [-16//11; -2//11; -1//11; 4//11; 2//11; 1//1][:,:]
     @test balance(equationmatrix(ce"H2 + O2 = H2O")) ==
         balance(equationmatrix(ce"2 H2 + O2 = 2 H2O"))
 

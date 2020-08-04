@@ -1,11 +1,11 @@
 "Type stored in `Compound.tuples`."
-const ElementTuple = Tuple{String, Int}
+const ElementTuple{T} = Tuple{String, T}
 
 "Regex to match `{±n}` charge."
-const CHARGEREGEX_1 = r"{((\+|-)\d*)}"
+const CHARGEREGEX_1 = r"{((\+|-).*)}"
 
 "Regex to match `{n±}` charge."
-const CHARGEREGEX_2 = r"{(\d)(\+|-)}"
+const CHARGEREGEX_2 = r"{(.*)(\+|-)}"
 
 """
 Stores chemical compound's elements and charge in a structured way.
@@ -13,10 +13,11 @@ Stores chemical compound's elements and charge in a structured way.
 !!! info
     Electron is stored as `"e"`.
 """
-struct Compound
-    tuples::Vector{ElementTuple}
-    charge::Int
+struct Compound{T<:Number}
+    tuples::Vector{ElementTuple{T}}
+    charge::T
 end
+Compound(tuples::Vector{ElementTuple{T}}, charge::T) where T = Compound{T}(tuples, charge)
 
 """
 Constructs a compound from `str`.
@@ -65,7 +66,7 @@ function elementtuples(str::AbstractString)
         return [("e", 1)]
     end
 
-    tuples = ElementTuple[]
+    tuples = ElementTuple{Int}[]
 
     # Add 1 to elements and parens without a coefficient
     str = replace(str,  r"(?<x>\p{L}|\p{S}|\))(?=(\p{Lu}|\(|\)|\*|$))" => s"\g<x>1")

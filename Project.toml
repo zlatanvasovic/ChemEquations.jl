@@ -4,14 +4,13 @@ authors = ["zdroid <zlatanvasovic@gmail.com> and contributors"]
 version = "0.1.0"
 
 [deps]
-AbstractAlgebra = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
-LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+LinearAlgebraX = "9b3f67b0-2d00-526e-9884-9e4938f8fb88"
 
 [compat]
-julia = "1"
-AbstractAlgebra = "0.9"
 DocStringExtensions = "0.8"
+LinearAlgebraX = "0.0.5"
+julia = "1"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

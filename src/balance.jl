@@ -10,14 +10,14 @@ julia> equationmatrix(ce"H2 + Cl2 → HCl")
  0  2  1
 ```
 """
-function equationmatrix(equation::ChemEquation)
+function equationmatrix(equation::ChemEquation{T}) where T
     vect = elements(equation)
     charged = hascharge(equation)
     if charged && "e" ∉ vect
         push!(vect, "")
     end
 
-    mat = zeros(Int, length(vect), length(equation.tuples))
+    mat = zeros(T, length(vect), length(equation.tuples))
     for (j, compoundtuple) ∈ enumerate(equation.tuples)
         compound = compoundtuple[1]
         for (element, k) ∈ compound.tuples
@@ -34,18 +34,13 @@ end
 
 """
 Balances an equation matrix using the *nullspace method*.
+Returns an array in which each column represents a solution.
 
 # References
 - [Thorne (2009)](https://arxiv.org/ftp/arxiv/papers/1110/1110.4321.pdf)
-- [Dylan Holmes's blogpost](http://logical.ai/chemistry/html/chem-nullspace.html)
 """
-function balance(mat::Matrix{Int})
-    mat::Matrix{Int} = transpose(mat) |>
-        x -> [x I] |>
-        x -> matrix(ZZ, x) |>
-        hnf |>
-        Matrix
-    return mat
+function balance(mat::AbstractMatrix)
+    return nullspacex(mat)
 end
 
 """
@@ -66,20 +61,21 @@ julia> balance(ce"Cr2O7{-2} + H{+} + {-} = Cr{+3} + H2O")
 ce"Cr2O7{-2} + 14 H{+} + 6 e = 2 Cr{+3} + 7 H2O"
 ```
 """
-function balance(equation::ChemEquation)
+function balance(equation::ChemEquation; fractions=false)
     eq = deepcopy(equation)
-    mat = equationmatrix(eq)
-    dim = size(mat)[1]
-    mat = balance(mat)
+    mat = balance(equationmatrix(eq))
+    num = size(mat)[2]
 
-    if iszero(mat[end, 1:dim])
-        if iszero(mat[end-1, 1:dim])
-            error("Chemical equation $equation can be balanced in infinitely many ways")
-        else
-            for (i, k) ∈ enumerate(mat[end, dim+1:end])
-                eq.tuples[i] = (eq.tuples[i][1], k)
-            end
+    if num == 1
+        if !fractions
+            mat ./= -gcd(mat)
+            mat = Int.(mat)
         end
+        for (i, k) ∈ enumerate(mat)
+            eq.tuples[i] = (eq.tuples[i][1], k)
+        end
+    elseif num > 1
+        error("Chemical equation $equation can be balanced in infinitely many ways")
     else
         error("Chemical equation $equation cannot be balanced")
     end

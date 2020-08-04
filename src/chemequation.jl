@@ -1,5 +1,5 @@
 "Type stored in `ChemEquation.tuples`."
-const CompoundTuple = Tuple{Compound, Int}
+const CompoundTuple{T} = Tuple{Compound{T}, T}
 
 fwd_arrows = ['>', '→', '↣', '↦', '⇾', '⟶', '⟼', '⥟', '⥟', '⇀', '⇁', '⇒', '⟾']
 bwd_arrows = ['<', '←', '↢', '↤', '⇽', '⟵', '⟻', '⥚', '⥞', '↼', '↽', '⇐', '⟽']
@@ -18,9 +18,10 @@ const PLUSREGEX = r"(?<!{)\+(?!})"
 """
 Stores chemical equation's compounds and their coefficients in a structured way.
 """
-struct ChemEquation
-    tuples::Vector{CompoundTuple}
+struct ChemEquation{T<:Number}
+    tuples::Vector{CompoundTuple{T}}
 end
+ChemEquation(tuples::Vector{CompoundTuple{T}}) where T = ChemEquation{T}(tuples)
 
 """
 Constructs a chemical equation from the given string.
@@ -45,13 +46,14 @@ ChemEquation(str::AbstractString) = ChemEquation(compoundtuples(str))
 
 "Extracts compound tuples from equation's string."
 function compoundtuples(str::AbstractString)
-    tuples = replace(str, ' ' => "") |>
+    strs = replace(str, ' ' => "") |>
         x -> split(x, EQUALCHARS) |>
         x -> split.(x, PLUSREGEX) # '+' not after '{' and not before '}'
-    splitindex = length(tuples[1])
-    tuples::Vector{Any} = [tuples[1]; tuples[2]]
+    splitindex = length(strs[1])
+    strs = [strs[1]; strs[2]]
+    tuples = Vector{CompoundTuple{Int}}(undef, length(strs))
 
-    for (i, compound) ∈ enumerate(tuples)
+    for (i, compound) ∈ enumerate(strs)
         k = 1
         if isdigit(compound[1])
             k, compound = match(r"(^\d+)(.+)", compound).captures
@@ -155,6 +157,5 @@ end
 
 "True if chemical equation has at least one compound with nonzero charge."
 function hascharge(equation::ChemEquation)
-    ionic = findfirst(hascharge, compounds(equation))
-    return !isnothing(ionic)
+    return findfirst(hascharge, compounds(equation)) !== nothing
 end
