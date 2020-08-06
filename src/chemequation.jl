@@ -13,7 +13,7 @@ Source: <https://github.com/SciML/Catalyst.jl/blob/master/src/reaction_network.j
 const EQUALCHARS = vcat(fwd_arrows, bwd_arrows, double_arrows, pure_rate_arrows, equal_signs)
 
 "Regex to split a chemical equation into compounds."
-const PLUSREGEX = r"(?<!{)\+(?!})"
+const PLUSREGEX = r"(?<!{)\+(?!})" # '+' not after '{' and not before '}'
 
 """
 Stores chemical equation's compounds and their coefficients in a structured way.
@@ -42,16 +42,17 @@ julia> ChemEquation("⏣H + Cl2 = ⏣Cl + HCl")
 ce"⏣H + Cl2 = ⏣Cl + HCl"
 ```
 """
-ChemEquation(str::AbstractString) = ChemEquation(compoundtuples(str))
+ChemEquation{T}(str::AbstractString) where T<:Number = ChemEquation(compoundtuples(str, T))
+ChemEquation(str::AbstractString) = ChemEquation{Int}(str)
 
 "Extracts compound tuples from equation's string."
-function compoundtuples(str::AbstractString)
+function compoundtuples(str::AbstractString, T::Type)
     strs = replace(str, ' ' => "") |>
         x -> split(x, EQUALCHARS) |>
-        x -> split.(x, PLUSREGEX) # '+' not after '{' and not before '}'
+        x -> split.(x, PLUSREGEX)
     splitindex = length(strs[1])
     strs = [strs[1]; strs[2]]
-    tuples = Vector{CompoundTuple{Int}}(undef, length(strs))
+    tuples = Vector{CompoundTuple{T}}(undef, length(strs))
 
     for (i, compound) ∈ enumerate(strs)
         k = 1

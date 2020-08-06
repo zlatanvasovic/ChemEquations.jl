@@ -1,11 +1,8 @@
 "Type stored in `Compound.tuples`."
 const ElementTuple{T} = Tuple{String, T}
 
-"Regex to match `{±n}` charge."
-const CHARGEREGEX_1 = r"{((\+|-).*)}"
-
-"Regex to match `{n±}` charge."
-const CHARGEREGEX_2 = r"{(.*)(\+|-)}"
+"Regex to match `{...}` charge string."
+const CHARGEREGEX = r"{(.*)}"
 
 """
 Stores chemical compound's elements and charge in a structured way.
@@ -55,18 +52,20 @@ julia> Compound("⬡Cl")
 cc"⬡Cl"
 ```
 """
-Compound(str::AbstractString) = Compound(elementtuples(str), charge(str))
+function Compound{T}(str::AbstractString) where T
+    str = replace(str, [' ', '_'] => "")
+    Compound(elementtuples(str, T), charge(str, T))
+end
+Compound(str::AbstractString) = Compound{Int}(str)
 
 "Extracts element tuples from compound's string."
-function elementtuples(str::AbstractString)
-    str = replace(str, [' ', '_'] => "") |>
-        x -> replace(x, CHARGEREGEX_1 => "") |>
-        x -> replace(x, CHARGEREGEX_2 => "")
+function elementtuples(str::AbstractString, T::Type)
+    str = replace(str, CHARGEREGEX => "")
     if str ∈ ("", "e")
         return [("e", 1)]
     end
 
-    tuples = ElementTuple{Int}[]
+    tuples = ElementTuple{T}[]
 
     # Add 1 to elements and parens without a coefficient
     str = replace(str,  r"(?<x>\p{L}|\p{S}|\))(?=(\p{Lu}|\(|\)|\*|$))" => s"\g<x>1")
@@ -107,28 +106,24 @@ function elementtuples(str::AbstractString)
     return tuples
 end
 
-"Extracts charge from compound's string."
-function charge(str::AbstractString)
+"Extracts charge from compound's string into a number of specified type."
+function charge(str::AbstractString, T::Type)
     if str == "e"
-        return -1
+        return T(-1)
     end
 
-    match_1 = match(CHARGEREGEX_1, str)
-    match_2 = match(CHARGEREGEX_2, str)
-    if isnothing(match_1) && isnothing(match_2)
-        charge = 0
+    strmatch = match(CHARGEREGEX, str)
+    if isnothing(strmatch)
+        return T(0)
     else
-        if isnothing(match_1)
-            charge = match_2.captures[2] * match_2.captures[1]
-        else
-            charge = match_1.captures[1]
+        str = strmatch.captures[1]
+        if str ∈ ("-", "+")
+            str *= "1"
+        elseif str[end] ∈ ('-', '+')
+            str = str[end] * str[1:end-1]
         end
-        if charge ∈ ("-", "+")
-            charge *= "1"
-        end
-        charge = parse(Int, charge)
+        return Meta.parse(str) |> eval |> T
     end
-    return charge
 end
 
 """
