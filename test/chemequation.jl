@@ -9,6 +9,11 @@ redox = ce"Cr2O7{-2} + H{+1} + {-} = Cr{3+} + H2O"
         [(cc"Na{+1}", 1), (cc"Cl{-1}", 1), (cc"ClNa", -1)]
     @test ChemEquation("N2+O2⇌2NO").tuples ==
         [(cc"N2", 1), (cc"O2", 1), (cc"NO", -2)]
+
+    testtuple = [(cc"H2", 0.5), (cc"Cl2", 0.5), (cc"HCl", -1.0)]
+    @test ChemEquation(testtuple) == ChemEquation{Float64}(testtuple)
+    @test ChemEquation{Rational}("1//2 H2 + 1//2 Cl2 → HCl").tuples == testtuple
+    @test ChemEquation{Float64}("0.5 H2 + 0.5 Cl2 → HCl").tuples == testtuple
 end
 
 @testset "@ce_str" begin

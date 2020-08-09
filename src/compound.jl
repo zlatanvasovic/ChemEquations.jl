@@ -1,5 +1,5 @@
 "Type stored in `Compound.tuples`."
-const ElementTuple{T} = Tuple{String, T}
+const ElementTuple = Tuple{String, Int}
 
 "Regex to match `{...}` charge string."
 const CHARGEREGEX = r"{(.*)}"
@@ -10,11 +10,10 @@ Stores chemical compound's elements and charge in a structured way.
 !!! info
     Electron is stored as `"e"`.
 """
-struct Compound{T<:Number}
-    tuples::Vector{ElementTuple{T}}
-    charge::T
+struct Compound
+    tuples::Vector{ElementTuple}
+    charge::Int
 end
-Compound(tuples::Vector{ElementTuple{T}}, charge::T) where T = Compound{T}(tuples, charge)
 
 """
 Constructs a compound from `str`.
@@ -37,35 +36,34 @@ It is automatically deduced for electron (`"e"`).
 # Examples
 ```jldoctest
 julia> Compound("H2O")
-cc"H2O"
+H2O
 
 julia> Compound("H3O{+}")
-cc"H3O{+}"
+H3O{+}
 
 julia> Compound("(CH3COO)2Mg")
-cc"C4H6O4Mg"
+C4H6O4Mg
 
 julia> Compound("CuSO4 * 5H2O")
-cc"CuSO9H10"
+CuSO9H10
 
 julia> Compound("⬡Cl")
-cc"⬡Cl"
+⬡Cl
 ```
 """
-function Compound{T}(str::AbstractString) where T
+function Compound(str::AbstractString)
     str = replace(str, [' ', '_'] => "")
-    Compound(elementtuples(str, T), charge(str, T))
+    Compound(_elementtuples(str), _charge(str))
 end
-Compound(str::AbstractString) = Compound{Int}(str)
 
 "Extracts element tuples from compound's string."
-function elementtuples(str::AbstractString, T::Type)
+function _elementtuples(str::AbstractString)
     str = replace(str, CHARGEREGEX => "")
     if str ∈ ("", "e")
         return [("e", 1)]
     end
 
-    tuples = ElementTuple{T}[]
+    tuples = ElementTuple[]
 
     # Add 1 to elements and parens without a coefficient
     str = replace(str,  r"(?<x>\p{L}|\p{S}|\))(?=(\p{Lu}|\(|\)|\*|$))" => s"\g<x>1")
@@ -84,8 +82,7 @@ function elementtuples(str::AbstractString, T::Type)
     for (i, substr) ∈ enumerate(str)
         if isdigit(substr[1])
             k, substr = match(r"(^\d+)(.+)", substr).captures
-            k = parse(Int, k)
-            substr = replace(substr, isdigit => x -> string(k * parse(Int, x)))
+            substr = replace(substr, isdigit => x -> string(parse(Int, k) * parse(Int, x)))
             str[i] = substr
         end
     end
@@ -107,14 +104,14 @@ function elementtuples(str::AbstractString, T::Type)
 end
 
 "Extracts charge from compound's string into a number of specified type."
-function charge(str::AbstractString, T::Type)
+function _charge(str::AbstractString)
     if str == "e"
-        return T(-1)
+        return -1
     end
 
     strmatch = match(CHARGEREGEX, str)
     if isnothing(strmatch)
-        return T(0)
+        return 0
     else
         str = strmatch.captures[1]
         if str ∈ ("-", "+")
@@ -122,7 +119,7 @@ function charge(str::AbstractString, T::Type)
         elseif str[end] ∈ ('-', '+')
             str = str[end] * str[1:end-1]
         end
-        return Meta.parse(str) |> eval |> T
+        return parse(Int, str)
     end
 end
 
@@ -132,7 +129,7 @@ Constructs a compound with `cc"str"` syntax, instead of `Compound(str)`.
 # Examples
 ```jldoctest
 julia> cc"H3O{+1}"
-cc"H3O{+}"
+H3O{+}
 ```
 """
 macro cc_str(str) Compound(str) end
@@ -172,7 +169,7 @@ function Base.string(compound::Compound)
     str = ""
     for (element, k) ∈ compound.tuples
         str *= element
-        if k > 1
+        if k ≠ 1
             str *= string(k)
         end
     end
@@ -193,7 +190,7 @@ end
 
 "Displays the compound using [`Base.string(::Compound)`](@ref)."
 function Base.show(io::IO, compound::Compound)
-    print(io, "cc", '"', string(compound), '"')
+    print(io, string(compound))
 end
 
 """

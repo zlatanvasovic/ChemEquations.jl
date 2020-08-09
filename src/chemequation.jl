@@ -1,5 +1,5 @@
 "Type stored in `ChemEquation.tuples`."
-const CompoundTuple{T} = Tuple{Compound{T}, T}
+const CompoundTuple{T} = Tuple{Compound, T}
 
 fwd_arrows = ['>', '→', '↣', '↦', '⇾', '⟶', '⟼', '⥟', '⥟', '⇀', '⇁', '⇒', '⟾']
 bwd_arrows = ['<', '←', '↢', '↤', '⇽', '⟵', '⟻', '⥚', '⥞', '↼', '↽', '⇐', '⟽']
@@ -15,13 +15,25 @@ const EQUALCHARS = vcat(fwd_arrows, bwd_arrows, double_arrows, pure_rate_arrows,
 "Regex to split a chemical equation into compounds."
 const PLUSREGEX = r"(?<!{)\+(?!})" # '+' not after '{' and not before '}'
 
-"""
-Stores chemical equation's compounds and their coefficients in a structured way.
-"""
-struct ChemEquation{T<:Number}
+"Stores chemical equation's compounds and their coefficients in a structured way."
+struct ChemEquation{T<:Real}
     tuples::Vector{CompoundTuple{T}}
 end
-ChemEquation(tuples::Vector{CompoundTuple{T}}) where T = ChemEquation{T}(tuples)
+
+"""
+Constructs a chemical equation of specified type from `str`.
+Follows the same rules as [`ChemEquation(::AbstractString)`](@ref).
+
+# Examples
+```jldoctest
+julia> ChemEquation{Rational}("1//2 H2 → H")
+1//2 H2 = H
+
+julia> ChemEquation{Float64}("0.5 H2 + 0.5 Cl2 = HCl")
+0.5 H2 + 0.5 Cl2 = HCl
+```
+"""
+ChemEquation{T}(str::AbstractString) where T<:Real = ChemEquation(_compoundtuples(str, T))
 
 """
 Constructs a chemical equation from the given string.
@@ -33,20 +45,19 @@ while `+` separates the equation into compounds.
 # Examples
 ```jldoctest
 julia> ChemEquation("N2+O2⇌2NO")
-ce"N2 + O2 = 2 NO"
+N2 + O2 = 2 NO
 
 julia> ChemEquation("CH3COOH + Na → H2 + CH3COONa")
-ce"C2H4O2 + Na = H2 + C2H3O2Na"
+C2H4O2 + Na = H2 + C2H3O2Na
 
 julia> ChemEquation("⏣H + Cl2 = ⏣Cl + HCl")
-ce"⏣H + Cl2 = ⏣Cl + HCl"
+⏣H + Cl2 = ⏣Cl + HCl
 ```
 """
-ChemEquation{T}(str::AbstractString) where T<:Number = ChemEquation(compoundtuples(str, T))
 ChemEquation(str::AbstractString) = ChemEquation{Int}(str)
 
 "Extracts compound tuples from equation's string."
-function compoundtuples(str::AbstractString, T::Type)
+function _compoundtuples(str::AbstractString, T::Type)
     strs = replace(str, ' ' => "") |>
         x -> split(x, EQUALCHARS) |>
         x -> split.(x, PLUSREGEX)
@@ -56,9 +67,10 @@ function compoundtuples(str::AbstractString, T::Type)
 
     for (i, compound) ∈ enumerate(strs)
         k = 1
-        if isdigit(compound[1])
-            k, compound = match(r"(^\d+)(.+)", compound).captures
-            k = parse(Int, k)
+        if isdigit(compound[1]) # begins with a digit
+            charindex = findfirst(r"\(?(\p{L}|\p{S})", compound)[1]
+            k, compound = compound[1:charindex-1], compound[charindex:end]
+            k = Meta.parse(k) |> eval
         end
         if i > splitindex
             k *= -1
@@ -75,7 +87,7 @@ Constructs a chemical equation with `ce"str"` syntax, instead of `ChemEquation(s
 # Examples
 ```jldoctest
 julia> ce"H2 + O2 → H2O"
-ce"H2 + O2 = H2O"
+H2 + O2 = H2O
 ```
 """
 macro ce_str(str) ChemEquation(str) end
@@ -112,16 +124,14 @@ function Base.string(equation::ChemEquation)
     left = String[]
     right = String[]
     for (compound, k) ∈ equation.tuples
-        str = string(compound)
+        str = ""
+        if k ∉ (-1, 1)
+            str *= string(abs(k)) * " "
+        end
+        str *= string(compound)
         if k > 0
-            if k ≠ 1
-                str = "$k " * str
-            end
             push!(left, str)
-        elseif k < 0
-            if k ≠ -1
-                str = "$(-k) " * str
-            end
+        else
             push!(right, str)
         end
     end
@@ -132,7 +142,7 @@ end
 
 "Displays the chemical equation using [`Base.string(::Compound)`](@ref)."
 function Base.show(io::IO, equation::ChemEquation)
-    print(io, "ce", '"', string(equation), '"')
+    print(io, string(equation))
 end
 
 "Returns chemical equation's compounds in a list."

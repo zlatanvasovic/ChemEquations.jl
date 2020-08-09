@@ -5,7 +5,7 @@ Write and balance chemical equations elegantly and efficiently.
 """
 module ChemEquations
 
-using LinearAlgebraX: I, nullspacex
+using LinearAlgebraX: I, nullspacex, IntegerX
 using DocStringExtensions
 @template (CONSTANTS, MACROS) =
     """
@@ -27,7 +27,7 @@ using DocStringExtensions
 export Compound, ChemEquation,
     @ce_str, @cc_str, ==, string, show,
     compounds, elements, hascharge,
-    equationmatrix, balance
+    equationmatrix, balancematrix, balance
 
 include("compound.jl")
 include("chemequation.jl")

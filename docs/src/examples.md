@@ -8,16 +8,17 @@ similar to `r` prefix for regex in Julia.
 
 ```julia-repl
 julia> equation = ce"Fe + Cl2 = FeCl3"
-ce"Fe + Cl2 = FeCl3"
+Fe + Cl2 = FeCl3
+
 julia> balance(equation)
-ce"2 Fe + 3 Cl2 = 2 FeCl3"
+2 Fe + 3 Cl2 = 2 FeCl3
 ```
 
 Parsing the input is insensitive to whitespace, so you don't have to be pedantic if you don't want to.
 
 ```julia-repl
 julia> balance(ce"KMnO4+ HCl = KCl+MnCl2 +H2O + Cl2")
-ce"2 KMnO4 + 16 HCl = 2 KCl + 2 MnCl2 + 8 H2O + 5 Cl2"
+2 KMnO4 + 16 HCl = 2 KCl + 2 MnCl2 + 8 H2O + 5 Cl2
 ```
 
 Parentheses (`()`), compounds written with `*` and electrical charges are all supported.
@@ -26,10 +27,10 @@ Charge is also supposed to be in any of those forms.
 
 ```julia-repl
 julia> balance(ce"K4Fe(CN)6 + H2SO4 + H2O = K2SO4 + FeSO4 + (NH4)2SO4 + CO")
-ce"K4FeC6N6 + 6 H2SO4 + 6 H2O = 2 K2SO4 + FeSO4 + 3 N2H8SO4 + 6 CO"
+K4FeC6N6 + 6 H2SO4 + 6 H2O = 2 K2SO4 + FeSO4 + 3 N2H8SO4 + 6 CO
 
 julia> balance(ce"Cr2O7{-2} + H{+} + {-} = Cr{+3} + H2O")
-ce"Cr2O7{-2} + 14 H{+} + 6 e = 2 Cr{+3} + 7 H2O"
+Cr2O7{-2} + 14 H{+} + 6 e = 2 Cr{+3} + 7 H2O
 
 julia> balance(ce"CuSO4*5H2O = CuSO4 + H2O")
 CuSO9H10 = CuSO4 + 5 H2O
@@ -38,17 +39,17 @@ CuSO9H10 = CuSO4 + 5 H2O
 Even the hardest exercises are in the reach:
 ```julia-repl
 julia> balance(ce"K4Fe(CN)6 + KMnO4 + H2SO4 = KHSO4 + Fe2(SO4)3 + MnSO4 + HNO3 + CO2 + H2O")
-ce"10 K4FeC6N6 + 122 KMnO4 + 299 H2SO4 = 162 KHSO4 + 5 Fe2S3O12 + 122 MnSO4 + 60 HNO3 + 60 CO2 + 188 H2O"
+10 K4FeC6N6 + 122 KMnO4 + 299 H2SO4 = 162 KHSO4 + 5 Fe2S3O12 + 122 MnSO4 + 60 HNO3 + 60 CO2 + 188 H2O
 ```
 
 Writing equations with a different equal sign is also possible
 (see [`ChemEquation(::AbstractString)`](@ref) for reference):
 ```julia-repl
 julia> ce"N2+O2⇌2NO"
-ce"N2 + O2 = 2 NO"
+N2 + O2 = 2 NO
 
-julia> ce"
-ce"H2 + O2 = H2O"
+julia> ce"H2 + O2 → H2O"
+H2 + O2 = H2O
 ```
 
 Are two chemical equations identical? Let's find out:
@@ -67,10 +68,10 @@ The syntax is similar, just with `cc` prefix (**c**hemical **c**ompound) instead
 
 ```julia-repl
 julia> cc"CuSO4*5H2O"
-cc"CuSO9H10"
+CuSO9H10
 
 julia> cc"H3O{+1}"
-cc"H3O{+}
+H3O{+}
 ```
 
 As you could notice, input string is transformed so that every atom appears only once.
@@ -86,7 +87,7 @@ All unicode characters that are letters (such as α and β) or symbols (such as 
 That allows some exotic examples:
 ```julia-repl
 julia> ce"Σ{+1} + Θ{-1} = Θ2 + Σ2"
-ce"Σ{+} + Θ{-} = Θ2 + Σ2"
+Σ{+} + Θ{-} = Θ2 + Σ2
 ```
 
 This works because compounds are parsed by elements, where an element begins with an uppercase unicode letter and
@@ -102,10 +103,37 @@ Examples of those are ⎔ (`\hexagon`), ⬡ (`varhexagon`), ⬢ (`\varhexagonbla
 Unicode input allows writing some equations very nicely:
 ```julia-repl
 julia> ce"⏣H + Cl2 = ⏣Cl + HCl"
-ce"⏣H + Cl2 = ⏣Cl + HCl"
+⏣H + Cl2 = ⏣Cl + HCl
 
 julia> ce"C + α = O + γ" # a reaction from triple-α process
-ce"C + α = O + γ"
+C + α = O + γ
+```
+
+## Non-integer coefficients
+
+Sometimes coefficients in a chemical equation are written as fractions or decimals.
+
+To initialize such equation, you need to specify the appropriate Julia type for the coefficients.
+`Rational` or `Rational{Int}` is appropriate for exact fractions, while `Float64` is appropriate for decimals.
+```julia-repl
+julia> ChemEquation{Rational}("1//2 H2 + 1//2 Cl2 → HCl")
+1//2 H2 = H
+
+julia> ChemEquation{Float64}("0.5 H2 + 0.5 Cl2 = HCl")
+0.5 H2 + 0.5 Cl2 = HCl
+```
+Previous two examples are equivalent (test it with `==`!), thanks to the way that numbers are stored in Julia.
+
+You can also initialize the equation normally:
+```julia-repl
+julia> eq = ce"H2 + Cl2 → HCl"
+H2 + Cl2 = HCl
+```
+
+and then choose to balance it with rational fractions as coefficients:
+```julia-repl
+julia> balance(eq, fractions=true)
+1//2 H2 + 1//2 Cl2 = HCl
 ```
 
 ## Advanced usage

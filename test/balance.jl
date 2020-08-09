@@ -1,5 +1,7 @@
 combustion = ce"C2H4 + O2 = CO2 + 2 H2O"
 redox = ce"H{+} + Cr2O7{2-} + C2H5OH = Cr{3+} + CO2 + H2O"
+cerational = ChemEquation{Rational}("1//2 H2 + O2 → H2O")
+cefloat = ChemEquation{Float64}("0.33 N3 + 0.5 O2 = NO")
 
 @testset "equationmatrix" begin
     @test equationmatrix(combustion) == [
@@ -14,17 +16,28 @@ redox = ce"H{+} + Cr2O7{2-} + C2H5OH = Cr{3+} + CO2 + H2O"
         0   0  2  0  1  0
         1  -2  0  3  0  0
     ]
+    @test equationmatrix(cerational) == [
+        2//1  0//1  2//1
+        0//1  2//1  1//1
+    ]
+    @test equationmatrix(cefloat) == [
+        3.0  0.0  1.0
+        0.0  2.0  1.0
+    ]
     @test equationmatrix(ce"151 H2 + 32 O2 = 7 H2O") ==
         equationmatrix(ce"5 H2 + O2 = 5 H2O")
 end
 
-@testset "balance" begin
+@testset "balancematrix" begin
     # [:,:] required to reshape Vector to Nx1 Array
-    @test balance(equationmatrix(combustion)) == [-1//2; -3//2; 1//1; 1//1][:,:]
-    @test balance(equationmatrix(redox)) ==  [-16//11; -2//11; -1//11; 4//11; 2//11; 1//1][:,:]
-    @test balance(equationmatrix(ce"H2 + O2 = H2O")) ==
-        balance(equationmatrix(ce"2 H2 + O2 = 2 H2O"))
+    @test balancematrix(combustion) == [1//1; 3//1; -2//1; -2//1][:,:]
+    @test balancematrix(redox, fractions=true) == [16//11; 2//11; 1//11; -4//11; -2//11; -1//1][:,:]
+    @test balancematrix(cerational) == [1//1; 1//2; -1//1][:,:]
+    @test balancematrix(cefloat) == [0.3333333333333333; 0.5; -1.0][:,:]
+    @test balancematrix(ce"H2 + O2 = H2O") == balancematrix(ce"2 H2 + O2 = 2 H2O")
+end
 
+@testset "balance" begin
     # Original equation should be unchanged
     balanced_combustion = balance(combustion)
     @test combustion == combustion
@@ -48,11 +61,15 @@ end
         "PhCH3 + KMnO4 + H2SO4 = PhCOOH + K2SO4 + MnSO4 + H2O" =>
             "5 PhCH3 + 6 KMnO4 + 9 H2SO4 = 5 PhCO2H + 3 K2SO4 + 6 MnSO4 + 14 H2O",
         "CuSO4*5H2O = CuSO4 + H2O" =>
-            "CuSO4*5H2O = CuSO4 + 5 H2O"
+            "CuSO4*5H2O = CuSO4 + 5 H2O",
     ]
     for equation ∈ equations
         @test balance(ChemEquation(equation[1])) == ChemEquation(equation[2])
     end
+
+    @test balance(cerational) == ChemEquation{Rational}("H2 + 1//2 O2 = H2O")
+    @test balance(cefloat) == ChemEquation{Float64}("0.3333333333333333 N3 + 0.5 O2 = NO")
+    @test balance(combustion, fractions=true) == ChemEquation{Rational}("1//2 C2H4 + 3//2 O2 = CO2 + H2O")
 
     @test_throws ErrorException balance(ce"H2 + O = H + O")
     @test_throws ErrorException balance(ce"H2 + CO = H2O")

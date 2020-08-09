@@ -13,13 +13,13 @@ should be as simple as this:
 julia> using ChemEquations
 
 julia> equation = ce"CH4 + O2 = CO2 + H2O"
-ce"CH4 + O2 = CO2 + H2O"
+CH4 + O2 = CO2 + H2O
 ```
 
 and balancing it should be even easier:
 ```julia-repl
 julia> balance(equation)
-ce"CH4 + 2 O2 = CO2 + 2 H2O"
+CH4 + 2 O2 = CO2 + 2 H2O
 ```
 
 ## Installation
