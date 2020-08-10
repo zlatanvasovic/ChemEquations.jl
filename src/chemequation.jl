@@ -45,7 +45,6 @@ julia> ChemEquation{Rational}("1//2 H2 → H")
 julia> ChemEquation{Float64}("0.5 H2 + 0.5 Cl2 = HCl")
 0.5 H2 + 0.5 Cl2 = HCl
 ```
-```
 """
 ChemEquation{T}(str::AbstractString) where T<:Real = ChemEquation(_compoundtuples(str, T))
 ChemEquation(str::AbstractString) = ChemEquation{Int}(str)
