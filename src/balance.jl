@@ -47,7 +47,9 @@ Returns an array in which each column represents a solution.
 balancematrix(equation::ChemEquation) = _balancematrix(equation)
 
 """
-Same as [`balancematrix(::ChemEquation)`](@ref), but with special format options.
+Same as [`balancematrix(::ChemEquation)`](@ref),
+but for a chemical equation with integer coefficients.
+
 By default, the solutions of integer matrices are displayed as integers.
 If `fractions` is true, they will be displayed as rational fractions instead.
 """
@@ -62,7 +64,6 @@ end
 
 """
 Balances the coefficients of a chemical equation.
-
 If the equation cannot be balanced, an error is thrown.
 
 !!! info
@@ -75,11 +76,13 @@ julia> balance(ce"Fe + Cl2 = FeCl3")
 
 julia> balance(ChemEquation{Rational}("H2 + Cl2 = HCl"))
 1//2 H2 + 1//2 Cl2 = HCl
+```
 """
 balance(equation::ChemEquation) = _balance(equation)
 
 """
 Balances the coefficients of a chemical equation with integer coefficients.
+
 The minimal integer solution is displayed by default.
 If `fractions` is true, they solution will be displayed as rational fractions instead.
 

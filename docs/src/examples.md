@@ -14,11 +14,15 @@ julia> balance(equation)
 2 Fe + 3 Cl2 = 2 FeCl3
 ```
 
-Parsing the input is insensitive to whitespace, so you don't have to be pedantic if you don't want to.
+Parsing the input is insensitive to whitespace and to state symbols (`(s)`, `(l)`, `(g)`, `(aq)`),
+so you don't have to be pedantic if you don't want to.
 
 ```julia-repl
 julia> balance(ce"KMnO4+ HCl = KCl+MnCl2 +H2O + Cl2")
 2 KMnO4 + 16 HCl = 2 KCl + 2 MnCl2 + 8 H2O + 5 Cl2
+
+julia> balance(ce"Zn(s) + O2(g) = ZnO(s)")
+2 Zn + O2 = 2 ZnO
 ```
 
 Parentheses (`()`), compounds written with `*` and electrical charges are all supported.

@@ -21,22 +21,8 @@ struct ChemEquation{T<:Real}
 end
 
 """
-Constructs a chemical equation of specified type from `str`.
-Follows the same rules as [`ChemEquation(::AbstractString)`](@ref).
-
-# Examples
-```jldoctest
-julia> ChemEquation{Rational}("1//2 H2 → H")
-1//2 H2 = H
-
-julia> ChemEquation{Float64}("0.5 H2 + 0.5 Cl2 = HCl")
-0.5 H2 + 0.5 Cl2 = HCl
-```
-"""
-ChemEquation{T}(str::AbstractString) where T<:Real = ChemEquation(_compoundtuples(str, T))
-
-"""
 Constructs a chemical equation from the given string.
+If no `{Type}` is provided, it defaults to `Int`.
 
 Parsing is insensitive to whitespace.
 Any character in [`EQUALCHARS`](@ref) separates the equation into two sides,
@@ -52,13 +38,21 @@ C2H4O2 + Na = H2 + C2H3O2Na
 
 julia> ChemEquation("⏣H + Cl2 = ⏣Cl + HCl")
 ⏣H + Cl2 = ⏣Cl + HCl
+
+julia> ChemEquation{Rational}("1//2 H2 → H")
+1//2 H2 = H
+
+julia> ChemEquation{Float64}("0.5 H2 + 0.5 Cl2 = HCl")
+0.5 H2 + 0.5 Cl2 = HCl
+```
 ```
 """
+ChemEquation{T}(str::AbstractString) where T<:Real = ChemEquation(_compoundtuples(str, T))
 ChemEquation(str::AbstractString) = ChemEquation{Int}(str)
 
 "Extracts compound tuples from equation's string."
 function _compoundtuples(str::AbstractString, T::Type)
-    strs = replace(str, ' ' => "") |>
+    strs = replace(str, [' ', '_'] => "") |>
         x -> split(x, EQUALCHARS) |>
         x -> split.(x, PLUSREGEX)
     splitindex = length(strs[1])
@@ -112,7 +106,7 @@ Creates a string to represent the chemical equation.
 All compounds are displayed with [`Base.string(::Compound)`](@ref),
 in the order in which they were originally given,
 with coefficients equal to 1 not displayed.
-'=' and '+' are used as separators, with spaces inserted for easier reading.
+`'='` and `'+'` are used as separators, with spaces inserted for easier reading.
 
 # Examples
 ```jldoctest

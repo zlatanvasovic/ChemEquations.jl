@@ -25,7 +25,8 @@ ends with a lowercase unicode letter or a unicode symbol.
     An element can also begin with a symbol if
     the symbol is the first character (e.g. `"⬡H"`).
 
-Parsing is insensitive to whitespace and underscores (`_`).
+Parsing is insensitive to whitespace and underscores (`_`),
+but also to state symbols (`(s)`, `(l)`, `(g)`, `(aq)`).
 Special parsing is implemented for:
 - parens (e.g. `"(CH3COO)2Mg"`)
 - compounds with `"*"` (e.g. `"CuSO4 * 5H2O"`)
@@ -35,7 +36,7 @@ It is automatically deduced for electron (`"e"`).
 
 # Examples
 ```jldoctest
-julia> Compound("H2O")
+julia> Compound("H2O(s)")
 H2O
 
 julia> Compound("H3O{+}")
@@ -53,6 +54,7 @@ julia> Compound("⬡Cl")
 """
 function Compound(str::AbstractString)
     str = replace(str, [' ', '_'] => "")
+    str = replace(str, r"\((s|l|g|aq)\)$" => "") # remove state symbols
     Compound(_elementtuples(str), _charge(str))
 end
 
@@ -153,7 +155,7 @@ Creates a string to represent the compound.
 
 All elements are displayed only once (e.g. `"H2O"` and not `"HOH"`),
 in the order in which they were originally given (e.g. `"MgO2H2"` from `cc"Mg(OH)2"`),
-with coefficients equal to 1 not displayed (e.g. `"O"` and not `"O1"`).
+with coefficients equal to 1 not displayed (e.g. `"H"` and not `"H1"`).
 
 # Examples
 ```jldoctest

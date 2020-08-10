@@ -22,6 +22,10 @@ end
     @test cc"H2" == cc"H2"
     @test cc"{-}" == cc"{-1}"
     @test cc"CH2(OH)2(CH)" == cc"O2H5C2"
+
+    @test cc"H H" == cc"H2"
+    @test cc"H_1C_1O_1" == cc"HCO"
+    @test cc"Mg(OH)2(s)" == cc"Mg(OH)2(aq)"
 end
 
 @testset "string" begin

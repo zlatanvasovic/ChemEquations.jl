@@ -62,6 +62,7 @@ end
             "5 PhCH3 + 6 KMnO4 + 9 H2SO4 = 5 PhCO2H + 3 K2SO4 + 6 MnSO4 + 14 H2O",
         "CuSO4*5H2O = CuSO4 + H2O" =>
             "CuSO4*5H2O = CuSO4 + 5 H2O",
+        "Zn(s) + O2(g) = ZnO(s)" => "2 Zn + O2 = 2 ZnO"
     ]
     for equation ∈ equations
         @test balance(ChemEquation(equation[1])) == ChemEquation(equation[2])
