@@ -9,7 +9,6 @@ jobs:
     strategy:
       matrix:
         version:
-          - '1.0'
           - '1.5'
           - 'nightly'
         os:
@@ -55,8 +54,9 @@ jobs:
             Pkg.instantiate()'
       - run: |
           julia --project=docs -e '
-            using Documenter: doctest
+            using Documenter: doctest, DocMeta
             using ChemEquations
+            DocMeta.setdocmeta!(ChemEquations, :DocTestSetup, :(using ChemEquations); recursive=true)
             doctest(ChemEquations)'
       - run: julia --project=docs docs/make.jl
         env:
