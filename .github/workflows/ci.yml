@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         version:
-          - '1.4'
+          - '1.0'
           - '1.5'
           - 'nightly'
         os:
@@ -53,6 +53,11 @@ jobs:
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()'
+      - run: |
+          julia --project=docs -e '
+            using Documenter: doctest
+            using ChemEquations
+            doctest(ChemEquations)'
       - run: julia --project=docs docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
