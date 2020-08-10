@@ -9,7 +9,7 @@ CH_4 + O_2 \to CO_2 + H_2 O
 ```
 
 should be as simple as this:
-```julia-repl
+```jldoctest label_1
 julia> using ChemEquations
 
 julia> equation = ce"CH4 + O2 = CO2 + H2O"
@@ -17,7 +17,7 @@ CH4 + O2 = CO2 + H2O
 ```
 
 and balancing it should be even easier:
-```julia-repl
+```jldoctest label_1
 julia> balance(equation)
 CH4 + 2 O2 = CO2 + 2 H2O
 ```
@@ -26,6 +26,6 @@ CH4 + 2 O2 = CO2 + 2 H2O
 
 You can install the package by pressing `]` in Julia REPL and typing:
 
-```julia
+```
 add ChemEquations
 ```
