@@ -1,17 +1,10 @@
 """
-    ChemEquations
-
 Write and balance chemical equations elegantly and efficiently.
 """
 module ChemEquations
 
 using LinearAlgebraX: I, nullspacex, IntegerX
 using DocStringExtensions
-@template (CONSTANTS, MACROS) =
-    """
-        $FUNCTIONNAME
-    $DOCSTRING
-    """
 @template TYPES =
     """
     $TYPEDEF
