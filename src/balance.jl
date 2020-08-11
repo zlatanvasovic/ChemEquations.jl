@@ -69,36 +69,22 @@ If the equation cannot be balanced, an error is thrown.
 !!! info
     The original equation is not modified.
 
+For equations with integer coefficients, the minimal integer solution is default.
+If `fractions` is true, it will be displayed as rational fractions instead.
+
 # Examples
 ```jldoctest
-julia> balance(ce"Fe + Cl2 = FeCl3")
-2 Fe + 3 Cl2 = 2 FeCl3
+julia> balance(ce"Cr2O7{-2} + H{+} + {-} = Cr{+3} + H2O")
+Cr2O7{-2} + 14 H{+} + 6 e = 2 Cr{+3} + 7 H2O
+
+julia> balance(ce"Fe + Cl2 = FeCl3", fractions=true)
+Fe + 3//2 Cl2 = FeCl3
 
 julia> balance(ChemEquation{Rational}("H2 + Cl2 = HCl"))
 1//2 H2 + 1//2 Cl2 = HCl
 ```
 """
-balance(equation::ChemEquation) = _balance(equation)
-
-"""
-Balances the coefficients of a chemical equation with integer coefficients.
-
-The minimal integer solution is displayed by default.
-If `fractions` is true, they solution will be displayed as rational fractions instead.
-
-# Examples
-```jldoctest
-julia> balance(ce"Fe + Cl2 = FeCl3", fractions=true)
-Fe + 3//2 Cl2 = FeCl3
-
-julia> balance(ce"Cr2O7{-2} + H{+} + {-} = Cr{+3} + H2O")
-Cr2O7{-2} + 14 H{+} + 6 e = 2 Cr{+3} + 7 H2O
-```
-"""
-balance(equation::ChemEquation{<:IntegerX}; fractions=false) = _balance(equation, fractions)
-
-"Wrapper function for [`balance`](@ref)."
-function _balance(equation::ChemEquation, fractions=false)
+function balance(equation::ChemEquation; fractions=false)
     if fractions
         eq = ChemEquation{Rational}(equation.tuples)
         mat = balancematrix(equation, fractions=true)
@@ -106,7 +92,7 @@ function _balance(equation::ChemEquation, fractions=false)
         eq = ChemEquation(equation.tuples)
         mat = balancematrix(equation)
     end
-    num = size(mat)[2]
+    num = size(mat, 2)
     if num == 1
         for (i, k) ∈ enumerate(mat)
             eq.tuples[i] = (eq.tuples[i][1], k)
