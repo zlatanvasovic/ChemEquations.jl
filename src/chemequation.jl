@@ -47,6 +47,7 @@ julia> ChemEquation{Float64}("0.5 H2 + 0.5 Cl2 = HCl")
 ```
 """
 ChemEquation{T}(str::AbstractString) where T<:Real = ChemEquation(_compoundtuples(str, T))
+
 ChemEquation(str::AbstractString) = ChemEquation{Int}(str)
 
 "Extracts compound tuples from equation's string."

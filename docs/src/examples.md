@@ -1,9 +1,7 @@
 # Examples
 
 ```@meta
-DocTestSetup = quote
-    using ChemEquations
-end
+DocTestSetup = :(using ChemEquations)
 ```
 
 ## Textbook exercises
