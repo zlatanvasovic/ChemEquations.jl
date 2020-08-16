@@ -9,7 +9,7 @@ LinearAlgebraX = "9b3f67b0-2d00-526e-9884-9e4938f8fb88"
 
 [compat]
 DocStringExtensions = "0.8"
-LinearAlgebraX = "0.0.6, 0.0.7"
+LinearAlgebraX = "0.0.6, 0.0.7, 0.0.8"
 julia = "1"
 
 [extras]
