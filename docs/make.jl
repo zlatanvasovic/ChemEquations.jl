@@ -1,7 +1,7 @@
 using ChemEquations
 using Documenter
 
-DocMeta.setdocmeta!(ChemEquations, :DocTestSetup, :(using ChemEquations); recursive=true)
+DocMeta.setdocmeta!(ChemEquations, :DocTestSetup, :(using ChemEquations))
 
 makedocs(;
     modules=[ChemEquations],

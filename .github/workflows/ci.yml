@@ -13,8 +13,6 @@ jobs:
           - 'nightly'
         os:
           - ubuntu-latest
-          - macOS-latest
-          - windows-latest
         arch:
           - x64
     steps:
@@ -56,7 +54,7 @@ jobs:
           julia --project=docs -e '
             using Documenter: doctest, DocMeta
             using ChemEquations
-            DocMeta.setdocmeta!(ChemEquations, :DocTestSetup, :(using ChemEquations); recursive=true)
+            DocMeta.setdocmeta!(ChemEquations, :DocTestSetup, :(using ChemEquations))
             doctest(ChemEquations)'
       - run: julia --project=docs docs/make.jl
         env:
