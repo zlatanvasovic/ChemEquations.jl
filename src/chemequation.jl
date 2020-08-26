@@ -162,5 +162,5 @@ end
 
 "True if chemical equation has at least one compound with nonzero charge."
 function hascharge(equation::ChemEquation)
-    return !isnothing(findfirst(hascharge, compounds(equation)))
+    return any(hascharge, compounds(equation))
 end
