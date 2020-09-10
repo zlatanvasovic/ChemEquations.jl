@@ -5,12 +5,12 @@ DocMeta.setdocmeta!(ChemEquations, :DocTestSetup, :(using ChemEquations))
 
 makedocs(;
     modules=[ChemEquations],
-    authors="zdroid <zlatanvasovic@gmail.com> and contributors",
-    repo="https://github.com/zdroid/ChemEquations.jl/blob/{commit}{path}#L{line}",
+    authors="zlatanvasovic <zlatanvasovic@gmail.com> and contributors",
+    repo="https://github.com/zlatanvasovic/ChemEquations.jl/blob/{commit}{path}#L{line}",
     sitename="ChemEquations.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://zdroid.github.io/ChemEquations.jl",
+        canonical="https://zlatanvasovic.github.io/ChemEquations.jl",
         assets=String[],
         analytics="UA-33643623-2",
     ),
@@ -25,5 +25,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/zdroid/ChemEquations.jl",
+    repo="github.com/zlatanvasovic/ChemEquations.jl",
 )
